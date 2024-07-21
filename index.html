@@ -1,1 +1,44 @@
-<h1>Hello World</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prendre une photo</title>
+    <style>
+        #camera {
+            display: none;
+        }
+        #photo {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prendre une photo</h1>
+    <video id="camera" width="320" height="240" autoplay></video>
+    <button id="capture">Prendre une photo</button>
+    <canvas id="photo" width="320" height="240"></canvas>
+
+    <script>
+        (function() {
+            const video = document.getElementById('camera');
+            const canvas = document.getElementById('photo');
+            const context = canvas.getContext('2d');
+            const captureButton = document.getElementById('capture');
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(err) {
+                    console.log("Une erreur est survenue: " + err);
+                });
+
+            captureButton.addEventListener('click', function() {
+                context.drawImage(video, 0, 0, 320, 240);
+                video.pause();
+            });
+        })();
+    </script>
+</body>
+</html>
