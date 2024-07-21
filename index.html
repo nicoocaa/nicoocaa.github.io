@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Prendre une photo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prendre une photo automatiquement</title>
     <style>
         #camera {
             display: none;
@@ -13,9 +15,8 @@
     </style>
 </head>
 <body>
-    <h1>Prendre une photo</h1>
+    <h1>Prendre une photo automatiquement</h1>
     <video id="camera" width="320" height="240" autoplay></video>
-    <button id="capture">Prendre une photo</button>
     <canvas id="photo" width="320" height="240"></canvas>
 
     <script>
@@ -23,21 +24,20 @@
             const video = document.getElementById('camera');
             const canvas = document.getElementById('photo');
             const context = canvas.getContext('2d');
-            const captureButton = document.getElementById('capture');
 
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function(stream) {
                     video.srcObject = stream;
                     video.play();
+                    video.onloadeddata = function() {
+                        // Prendre une photo automatiquement après que la vidéo a commencé
+                        context.drawImage(video, 0, 0, 320, 240);
+                        video.pause();
+                    };
                 })
                 .catch(function(err) {
                     console.log("Une erreur est survenue: " + err);
                 });
-
-            captureButton.addEventListener('click', function() {
-                context.drawImage(video, 0, 0, 320, 240);
-                video.pause();
-            });
         })();
     </script>
 </body>
