@@ -47,11 +47,12 @@
         .corps::before {
             content: ''; /* Nécessaire pour créer un élément */
             position: absolute;
-            width: 2px; /* Largeur de la ligne */
-            height: 100%; /* Hauteur de la ligne */
-            background-color: red; /* Couleur de la ligne */
-            left: 50%; /* Centre horizontalement */
-            transform: translateX(-50%); /* Ajuste pour centrer */
+            width: 100%; /* Largeur de la ligne */
+            height: 2px; /* Hauteur de la ligne */
+            background-color: green; /* Couleur de la ligne */
+            top: 50%; /* Centre verticalement */
+            left: 0; /* Aligne à gauche */
+            transform: translateY(-50%); /* Ajuste pour centrer */
             z-index: 11; /* Assure que la ligne est au-dessus du cadre */
         }
     </style>
