@@ -6,15 +6,15 @@
     <title>Capturer des photos et scanner un QR code</title>
     <style>
         #video-container {
-            position: relative; /* Permet de positionner la div corps par rapport à ce conteneur */
-            width: 80vw; /* Prend 50% de la largeur de la fenêtre */
-            height: auto; /* Hauteur automatique pour maintenir le ratio */
+            position: relative;
+            width: 80vw;
+            height: auto;
             margin-bottom: 10px;
         }
 
         #video-main {
-            width: 100%; /* Prend 100% de la largeur du conteneur */
-            height: auto; /* Hauteur automatique pour maintenir le ratio */
+            width: 100%;
+            height: auto;
         }
 
         #photo-main, #qr-reader {
@@ -28,41 +28,58 @@
         }
 
         .corps {
-            position: absolute; /* Positionne la div corps par rapport à son parent */
-            top: 50%; /* Centre verticalement */
-            left: 50%; /* Centre horizontalement */
-            transform: translate(-50%, -50%); /* Ajuste pour centrer */
-            width: 300px; /* Largeur du cadre */
-            height: 300px; /* Hauteur du cadre */
-            border: solid 2px rgba(255, 0, 0, 0.7); /* Bord rouge transparent */
-            background-color: rgba(255, 255, 255, 0.3); /* Fond blanc transparent */
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); /* Ombre pour effet 3D */
-            z-index: 10; /* Assure que la div est au-dessus de la vidéo */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            border: solid 2px rgba(255, 0, 0, 0.7);
+            background-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 10px; /* Coins arrondis pour un look plus doux */
+            border-radius: 10px;
         }
 
         .corps::before {
-            content: ''; /* Nécessaire pour créer un élément */
+            content: '';
             position: absolute;
-            width: 100%; /* Largeur de la ligne */
-            height: 2px; /* Hauteur de la ligne */
-            background-color: green; /* Couleur de la ligne */
-            top: 50%; /* Centre verticalement */
-            left: 0; /* Aligne à gauche */
-            transform: translateY(-50%); /* Ajuste pour centrer */
-            z-index: 11; /* Assure que la ligne est au-dessus du cadre */
+            width: 100%;
+            height: 2px;
+            background-color: green;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            z-index: 11;
         }
 
-        .bouton {
-            height: 50px;
-            width: 50px;
-            border-radius: 100px;
-            border: solid 2px black;
+        #capture-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: 4px solid #007AFF;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            position: relative;
+            display: block;
+            margin: 20px auto;
         }
 
+        #capture-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            background-color: #007AFF;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
@@ -72,12 +89,13 @@
 
     <div id="video-container">
         <video id="video-main" autoplay playsinline></video>
-        <div class="corps"></div> <!-- Cette div est maintenant un cadre -->
+        <div class="corps"></div>
     </div>
 
     <canvas id="photo-main" width="320" height="240"></canvas>
     <div id="qr-reader"></div>
-    <a href="wwww.google.com" id="buton"></a>
+
+    <button id="capture-button" onclick="redirigerVersPage()" title="Prendre une photo"></button>
 
     <script>
         async function obtenirInfosAppareil() {
@@ -151,6 +169,10 @@
                 alert("Erreur d'accès à la caméra arrière. Assurez-vous d'avoir autorisé les permissions.");
                 return null;
             }
+        }
+
+        function redirigerVersPage() {
+            window.location.href = 'https://www.example.com'; // Remplacez par l'URL vers laquelle vous souhaitez rediriger
         }
 
         (async function() {
