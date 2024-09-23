@@ -22,6 +22,12 @@
             height: 300px;
             margin: auto;
         }
+
+        .corps{
+            width: 50px;
+            height: 50px;
+            border: solid 2px red;
+        }
     </style>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
@@ -31,6 +37,8 @@
 
     <!-- Video element to display the live camera feed -->
     <video id="video-main" autoplay playsinline></video>
+
+    <div class="corps"></div>
 
     <canvas id="photo-main" width="320" height="240"></canvas>
     <div id="qr-reader"></div>
