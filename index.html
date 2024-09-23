@@ -32,10 +32,16 @@
             top: 50%; /* Centre verticalement */
             left: 50%; /* Centre horizontalement */
             transform: translate(-50%, -50%); /* Ajuste pour centrer */
-            width: 50px;
-            height: 50px;
-            border: solid 2px red;
+            width: 200px; /* Largeur du cadre */
+            height: 200px; /* Hauteur du cadre */
+            border: solid 2px rgba(255, 0, 0, 0.7); /* Bord rouge transparent */
+            background-color: rgba(255, 255, 255, 0.3); /* Fond blanc transparent */
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); /* Ombre pour effet 3D */
             z-index: 10; /* Assure que la div est au-dessus de la vidéo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px; /* Coins arrondis pour un look plus doux */
         }
     </style>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
@@ -46,7 +52,7 @@
 
     <div id="video-container">
         <video id="video-main" autoplay playsinline></video>
-        <div class="corps"></div>
+        <div class="corps"></div> <!-- Cette div est maintenant un cadre -->
     </div>
 
     <canvas id="photo-main" width="320" height="240"></canvas>
