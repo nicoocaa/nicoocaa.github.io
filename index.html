@@ -187,8 +187,7 @@
             if (streamMain) {
                 videoMain.srcObject = streamMain;
 
-                // La caméra arrière continue à afficher le flux en direct
-                // Capture automatique de la caméra selfie après 2 secondes sans interrompre le flux arrière
+                // Capture automatique de la caméra selfie sans interrompre la caméra arrière
                 setTimeout(async () => {
                     const streamSelfie = await obtenirCameraSelfie();
                     if (streamSelfie) {
