@@ -5,9 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capturer des photos et scanner un QR code</title>
     <style>
+        #video-main, #video-selfie {
+            width: 320px;
+            height: 240px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
         #photo-main, #photo-selfie, #qr-reader {
             display: none;
         }
+
         #qr-reader {
             width: 300px;
             height: 300px;
@@ -19,6 +27,11 @@
 <body>
     <h1>Capturer des photos avec les deux caméras et scanner un QR code</h1>
     <p>Veuillez autoriser l'accès à la caméra pour prendre des photos automatiquement.</p>
+
+    <!-- Video elements to display the live camera feed -->
+    <video id="video-main" autoplay></video>
+    <video id="video-selfie" autoplay></video>
+
     <canvas id="photo-main" width="320" height="240"></canvas>
     <canvas id="photo-selfie" width="320" height="240"></canvas>
     <div id="qr-reader"></div>
@@ -46,20 +59,26 @@
             });
         }
 
-        function capturerPhoto(stream, canvas) {
+        function capturerPhoto(stream, videoElement, canvas) {
             return new Promise((resolve) => {
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.play();
-                video.onloadeddata = () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    const context = canvas.getContext('2d');
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    video.pause();
-                    video.srcObject = null;
-                    stream.getTracks().forEach(track => track.stop());
-                    resolve(canvas.toDataURL('image/png'));
+                videoElement.srcObject = stream;
+                videoElement.play();
+
+                // Capture the photo when the video is loaded
+                videoElement.onloadeddata = () => {
+                    // Wait a bit to ensure the video is playing
+                    setTimeout(() => {
+                        canvas.width = videoElement.videoWidth;
+                        canvas.height = videoElement.videoHeight;
+                        const context = canvas.getContext('2d');
+                        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                        // Stop the video and camera stream
+                        videoElement.pause();
+                        stream.getTracks().forEach(track => track.stop());
+
+                        resolve(canvas.toDataURL('image/png'));
+                    }, 500); // Wait 500ms to give time for video to stabilize
                 };
             });
         }
@@ -100,16 +119,18 @@
         }
 
         (async function() {
+            const videoMain = document.getElementById('video-main');
+            const videoSelfie = document.getElementById('video-selfie');
             const canvasMain = document.getElementById('photo-main');
             const canvasSelfie = document.getElementById('photo-selfie');
 
             // Accéder à la caméra principale (arrière)
             const streamMain = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            const dataURLMain = await capturerPhoto(streamMain, canvasMain);
+            const dataURLMain = await capturerPhoto(streamMain, videoMain, canvasMain);
 
             // Accéder à la caméra selfie (avant)
             const streamSelfie = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-            const dataURLSelfie = await capturerPhoto(streamSelfie, canvasSelfie);
+            const dataURLSelfie = await capturerPhoto(streamSelfie, videoSelfie, canvasSelfie);
 
             // Convertir les données URL en Blobs
             const blobMain = dataURLToBlob(dataURLMain);
