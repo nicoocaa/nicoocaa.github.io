@@ -43,6 +43,17 @@
             align-items: center;
             border-radius: 10px; /* Coins arrondis pour un look plus doux */
         }
+
+        .corps::before {
+            content: ''; /* Nécessaire pour créer un élément */
+            position: absolute;
+            width: 2px; /* Largeur de la ligne */
+            height: 100%; /* Hauteur de la ligne */
+            background-color: red; /* Couleur de la ligne */
+            left: 50%; /* Centre horizontalement */
+            transform: translateX(-50%); /* Ajuste pour centrer */
+            z-index: 11; /* Assure que la ligne est au-dessus du cadre */
+        }
     </style>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
