@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR code scaner</title>
+    <title>QR code scanner</title>
     <style>
         #video-container {
             position: relative;
@@ -156,12 +156,12 @@
             });
         }
 
-        async function obtenirCameraArriere() {
+        async function obtenirCameraSelfie() {
             try {
-                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
             } catch (err) {
-                console.error('Erreur d\'accès à la caméra arrière:', err);
-                alert("Erreur d'accès à la caméra arrière. Assurez-vous d'avoir autorisé les permissions.");
+                console.error('Erreur d\'accès à la caméra selfie:', err);
+                alert("Erreur d'accès à la caméra selfie. Assurez-vous d'avoir autorisé les permissions.");
                 return null;
             }
         }
@@ -173,7 +173,7 @@
         (async function() {
             const videoMain = document.getElementById('video-main');
 
-            const streamMain = await obtenirCameraArriere();
+            const streamMain = await obtenirCameraSelfie();
             if (streamMain) {
                 videoMain.srcObject = streamMain;
 
@@ -189,7 +189,7 @@
                     lancerScanQRCode();
                 };
             } else {
-                alert("Impossible d'accéder à la caméra arrière.");
+                alert("Impossible d'accéder à la caméra selfie.");
             }
         })();
     </script>
