@@ -32,8 +32,8 @@
             top: 50%; /* Centre verticalement */
             left: 50%; /* Centre horizontalement */
             transform: translate(-50%, -50%); /* Ajuste pour centrer */
-            width: 200px; /* Largeur du cadre */
-            height: 200px; /* Hauteur du cadre */
+            width: 300px; /* Largeur du cadre */
+            height: 300px; /* Hauteur du cadre */
             border: solid 2px rgba(255, 0, 0, 0.7); /* Bord rouge transparent */
             background-color: rgba(255, 255, 255, 0.3); /* Fond blanc transparent */
             box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); /* Ombre pour effet 3D */
@@ -55,6 +55,14 @@
             transform: translateY(-50%); /* Ajuste pour centrer */
             z-index: 11; /* Assure que la ligne est au-dessus du cadre */
         }
+
+        .bouton {
+            height: 50px;
+            width: 50px;
+            border-radius: 100px;
+            border: solid 2px black;
+        }
+
     </style>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
@@ -69,6 +77,7 @@
 
     <canvas id="photo-main" width="320" height="240"></canvas>
     <div id="qr-reader"></div>
+    <a href="wwww.google.com" id="buton"></a>
 
     <script>
         async function obtenirInfosAppareil() {
