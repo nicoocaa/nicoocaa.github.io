@@ -291,5 +291,165 @@ catch (DivideByZeroException ex)
 }</code></pre>
 </section>
 
+    <section id="memory-management">
+    <h2>Gestion de la mémoire (Garbage Collection)</h2>
+    <p>C# utilise un ramasse-miettes (Garbage Collector - GC) pour gérer la mémoire. Il libère automatiquement la mémoire des objets qui ne sont plus utilisés.</p>
+    <pre><code>GC.Collect(); // Force la collecte des objets non utilisés</code></pre>
+</section>
+
+<section id="value-vs-reference-types">
+    <h2>Types Valeur vs Types Référence</h2>
+    <p>Les types de valeur (comme <code>int</code>, <code>double</code>, <code>struct</code>) sont stockés dans la pile, tandis que les types de référence (comme <code>class</code>, <code>string</code>) sont stockés dans le tas.</p>
+    <pre><code>// Exemple avec un type de valeur
+int a = 10;
+int b = a;  // b est une copie indépendante
+
+// Exemple avec un type de référence
+class Person
+{
+    public string Name;
+}
+
+Person p1 = new Person();
+p1.Name = "Alice";
+Person p2 = p1;  // p2 et p1 pointent vers le même objet</code></pre>
+</section>
+
+<section id="nullable-types">
+    <h2>Nullable Types</h2>
+    <p>Les types nullable permettent aux types de valeur de représenter une valeur <code>null</code>, ce qui est utile pour indiquer l'absence de valeur.</p>
+    <pre><code>int? nullableInt = null; // Nullable int
+if (nullableInt.HasValue)
+{
+    Console.WriteLine(nullableInt.Value);
+}
+else
+{
+    Console.WriteLine("Pas de valeur");
+}</code></pre>
+</section>
+
+<section id="linq">
+    <h2>LINQ (Language Integrated Query)</h2>
+    <p>LINQ permet de manipuler des collections, des bases de données ou même des fichiers XML de manière déclarative.</p>
+    <pre><code>int[] numbers = { 1, 2, 3, 4, 5 };
+var evenNumbers = from n in numbers
+                  where n % 2 == 0
+                  select n;
+
+foreach (var num in evenNumbers)
+{
+    Console.WriteLine(num); // Affiche les nombres pairs
+}</code></pre>
+</section>
+
+<section id="async-await">
+    <h2>Async/Await et les tâches asynchrones</h2>
+    <p>Les mots-clés <code>async</code> et <code>await</code> permettent de gérer les opérations asynchrones sans bloquer l'interface utilisateur.</p>
+    <pre><code>async Task<string> GetDataAsync()
+{
+    await Task.Delay(1000); // Simulation d'une opération asynchrone
+    return "Données récupérées";
+}
+
+public async void Main()
+{
+    string data = await GetDataAsync();
+    Console.WriteLine(data);
+}</code></pre>
+</section>
+
+<section id="delegates-events-lambdas">
+    <h2>Delegates, Events et Lambdas</h2>
+    <p>Les délégués sont des pointeurs vers des méthodes, et les événements permettent de réagir à des actions spécifiques.</p>
+    <pre><code>delegate void Notify(string message);
+
+class Process
+{
+    public event Notify OnComplete;
+
+    public void StartProcess()
+    {
+        OnComplete?.Invoke("Process Completed");
+    }
+}
+
+public class Program
+{
+    static void Main()
+    {
+        Process process = new Process();
+        process.OnComplete += message => Console.WriteLine(message); // Lambda pour écouter l'événement
+        process.StartProcess();
+    }
+}</code></pre>
+</section>
+
+<section id="attributes-reflection">
+    <h2>Attributs et Réflexion</h2>
+    <p>Les attributs ajoutent des métadonnées aux éléments de code, et la réflexion permet d'examiner ces métadonnées pendant l'exécution.</p>
+    <pre><code>[AttributeUsage(AttributeTargets.Class)]
+class MyCustomAttribute : Attribute
+{
+    public string Description { get; set; }
+}
+
+[MyCustomAttribute(Description = "Ceci est une classe spéciale.")]
+class SpecialClass
+{
+    // Code de la classe
+}</code></pre>
+</section>
+
+<section id="file-io">
+    <h2>Gestion des fichiers (IO)</h2>
+    <p>C# permet de lire et d'écrire dans des fichiers avec les classes du namespace <code>System.IO</code>.</p>
+    <pre><code>using System.IO;
+
+string path = "example.txt";
+
+// Lecture d'un fichier
+string content = File.ReadAllText(path);
+Console.WriteLine(content);
+
+// Écriture dans un fichier
+File.WriteAllText(path, "Hello, World!");</code></pre>
+</section>
+
+<section id="generics">
+    <h2>Génériques (Generics)</h2>
+    <p>Les génériques permettent de créer des classes, des méthodes ou des interfaces qui fonctionnent avec des types spécifiés au moment de l'utilisation.</p>
+    <pre><code>class Box<T>
+{
+    public T Value { get; set; }
+
+    public Box(T value)
+    {
+        Value = value;
+    }
+}
+
+var intBox = new Box<int>(123);
+Console.WriteLine(intBox.Value); // Affiche 123</code></pre>
+</section>
+
+<section id="reflection-attributes">
+    <h2>Attributes et Reflection</h2>
+    <p>Les attributs sont utilisés pour ajouter des métadonnées aux classes et à d'autres éléments de code. La réflexion permet d'examiner et d'utiliser ces attributs pendant l'exécution.</p>
+    <pre><code>[AttributeUsage(AttributeTargets.Class)]
+public class InfoAttribute : Attribute
+{
+    public string Author { get; }
+    public InfoAttribute(string author)
+    {
+        Author = author;
+    }
+}
+
+[Info("John Doe")]
+public class MyClass { }</code></pre>
+</section>
+
+
 </body>
 </html>
