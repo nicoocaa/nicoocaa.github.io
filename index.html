@@ -450,6 +450,136 @@ public class InfoAttribute : Attribute
 public class MyClass { }</code></pre>
 </section>
 
+     <section id="bases">
+        <h2>Bases de C#</h2>
+        <h3>Premiers pas avec C#</h3>
+        <pre><code>// Exemple : Hello World
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Hello, World!");
+    }
+}</code></pre>
+        <h3>Variables et types</h3>
+        <ul>
+            <li>int, double, float</li>
+            <li>string, char</li>
+            <li>bool</li>
+        </ul>
+        <pre><code>// Exemple de déclaration de variables
+int age = 25;
+string nom = "Jean";
+bool estActif = true;</code></pre>
+        <h3>Structures de contrôle</h3>
+        <pre><code>// Exemple de boucle for
+for (int i = 0; i < 5; i++)
+{
+    Console.WriteLine(i);
+}
+
+// Exemple de condition if-else
+if (age > 18)
+{
+    Console.WriteLine("Adulte");
+}
+else
+{
+    Console.WriteLine("Mineur");
+}</code></pre>
+    </section>
+    <section id="oop">
+        <h2>Programmation Orientée Objet (POO)</h2>
+        <h3>Classes et objets</h3>
+        <pre><code>// Exemple de classe et objet
+class Personne
+{
+    public string Nom { get; set; }
+    public int Age { get; set; }
+    
+    public void SePresenter()
+    {
+        Console.WriteLine($"Je m'appelle {Nom} et j'ai {Age} ans.");
+    }
+}
+
+// Utilisation
+Personne p = new Personne { Nom = "Alice", Age = 30 };
+p.SePresenter();</code></pre>
+    </section>
+    <section id="heritage">
+        <h2>Héritage</h2>
+        <p>L'héritage permet à une classe d'hériter des propriétés et méthodes d'une autre classe.</p>
+        <pre><code>// Exemple d'héritage
+class Animal
+{
+    public void Manger()
+    {
+        Console.WriteLine("Je mange.");
+    }
+}
+
+class Chien : Animal
+{
+    public void Aboyer()
+    {
+        Console.WriteLine("Woof!");
+    }
+}
+
+// Utilisation
+Chien monChien = new Chien();
+monChien.Manger();
+monChien.Aboyer();</code></pre>
+    </section>
+    <section id="interfaces">
+        <h2>Interfaces</h2>
+        <p>Les interfaces définissent un contrat que les classes doivent respecter.</p>
+        <pre><code>// Exemple d'interface
+interface IAnimal
+{
+    void SeDeplacer();
+}
+
+class Oiseau : IAnimal
+{
+    public void SeDeplacer()
+    {
+        Console.WriteLine("Je vole.");
+    }
+}
+
+// Utilisation
+IAnimal oiseau = new Oiseau();
+oiseau.SeDeplacer();</code></pre>
+    </section>
+    <section id="avances">
+        <h2>Concepts avancés</h2>
+        <h3>Gestion des exceptions</h3>
+        <pre><code>// Exemple de gestion des exceptions
+try
+{
+    int resultat = 10 / 0;
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine("Erreur : Division par zéro.");
+}</code></pre>
+        <h3>LINQ</h3>
+        <pre><code>// Exemple de LINQ
+using System;
+using System.Linq;
+
+int[] nombres = { 1, 2, 3, 4, 5 };
+var pairs = nombres.Where(n => n % 2 == 0);
+
+foreach (var nombre in pairs)
+{
+    Console.WriteLine(nombre);
+}</code></pre>
+    </section>
 
 </body>
 </html>
